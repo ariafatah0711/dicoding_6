@@ -54,15 +54,32 @@ const addBookHandler = (request, h) => {
   return response;
 };
 
-const getAllBooksHandler = () => ({
-  status: "success",
-  data: {
-    books: books.map((book) => ({ id: book.id, name: book.name, publisher: book.publisher })),
-  },
-});
+const getAllBooksHandler = (request) => {
+  const { name, reading, finished } = request.query;
+  let booksFilter = books;
+
+  if (name !== undefined) {
+    booksFilter = booksFilter.filter((book) => book.name.toLowerCase().includes(name.toLowerCase()));
+  }
+
+  if (reading !== undefined) {
+    booksFilter = booksFilter.filter((book) => book.reading === (reading === "1"));
+  }
+
+  if (finished !== undefined) {
+    booksFilter = booksFilter.filter((book) => book.finished === (finished === "1"));
+  }
+
+  return {
+    status: "success",
+    data: {
+      books: booksFilter.map((book) => ({ id: book.id, name: book.name, publisher: book.publisher })),
+    },
+  };
+};
 
 const getBookByIdHandler = (request, h) => {
-  const bookId = request.params.bookId;
+  const { bookId } = request.params;
 
   const book = books.find((book) => book.id == bookId);
 
@@ -84,7 +101,7 @@ const getBookByIdHandler = (request, h) => {
 };
 
 const editBookByIdHandler = (request, h) => {
-  const bookId = request.params.bookId;
+  const { bookId } = request.params;
 
   const { name, year, author, summary, publisher, pageCount, readPage, reading } = request.payload;
   const updatedAt = new Date().toISOString();
@@ -120,6 +137,7 @@ const editBookByIdHandler = (request, h) => {
       pageCount,
       readPage,
       reading,
+      updatedAt,
     };
     const response = h.response({
       status: "success",
@@ -138,7 +156,7 @@ const editBookByIdHandler = (request, h) => {
 };
 
 const deleteBookByIdHandler = (request, h) => {
-  const bookId = request.params.bookId;
+  const { bookId } = request.params;
 
   const index = books.findIndex((book) => book.id == bookId);
 
