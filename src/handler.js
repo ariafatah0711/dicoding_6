@@ -1,14 +1,15 @@
 const { nanoid } = require("nanoid");
-const notes = require("./notes");
+const books = require("./books");
 
-const addNoteHandler = (request, h) => {
-  const { name, year, author, summary, publisher, pageCount, readPage, reading, finished } = request.payload;
+const addBookHandler = (request, h) => {
+  const { name, year, author, summary, publisher, pageCount, readPage, reading } = request.payload;
 
   const id = nanoid(16);
   const insertedAt = new Date().toISOString();
   const updatedAt = insertedAt;
+  const finished = readPage === pageCount;
 
-  const newNotes = {
+  const newBook = {
     id,
     name,
     year,
@@ -40,7 +41,7 @@ const addNoteHandler = (request, h) => {
       .code(400);
   }
 
-  notes.push(newNotes);
+  books.push(newBook);
 
   const response = h.response({
     status: "success",
@@ -53,23 +54,23 @@ const addNoteHandler = (request, h) => {
   return response;
 };
 
-const getAllNotesHandler = () => ({
+const getAllBooksHandler = () => ({
   status: "success",
   data: {
-    books: notes.map((note) => ({ id: note.id, name: note.name, publisher: note.publisher })),
+    books: books.map((book) => ({ id: book.id, name: book.name, publisher: book.publisher })),
   },
 });
 
-const getNoteByIdHandler = (request, h) => {
-  const bookid = request.params.bookid;
+const getBookByIdHandler = (request, h) => {
+  const bookId = request.params.bookId;
 
-  const note = notes.find((note) => note.id == bookid);
+  const book = books.find((book) => book.id == bookId);
 
-  if (note != undefined) {
+  if (book != undefined) {
     return {
       status: "success",
       data: {
-        book: note,
+        book: book,
       },
     };
   }
@@ -82,4 +83,4 @@ const getNoteByIdHandler = (request, h) => {
   return response;
 };
 
-module.exports = { addNoteHandler, getAllNotesHandler, getNoteByIdHandler };
+module.exports = { addBookHandler, getAllBooksHandler, getBookByIdHandler };

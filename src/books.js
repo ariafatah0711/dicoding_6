@@ -13,5 +13,5 @@
 //     "updatedAt": "2021-03-04T09:11:44.598Z"
 // }
 
-const notes = [];
-module.exports = notes;
+const books = [];
+module.exports = books;
